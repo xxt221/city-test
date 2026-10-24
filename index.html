@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>测测你的本命定居城市｜你最适合在哪长期定居？</title>
+<style>
+  :root{
+    --bg:#f6f3ef; --card:#fffdfb; --ink:#4a4440; --muted:#9a918a;
+    --line:#e8e1db; --accent:#b7a99a; --accent-deep:#8f8072;
+    --soft:#efe9e3; --radius:20px; --shadow:0 8px 28px rgba(120,105,92,.08);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html{scroll-behavior:smooth}
+  body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);line-height:1.7;min-height:100vh;-webkit-font-smoothing:antialiased;}
+  .app{max-width:520px;margin:0 auto;padding:0 18px 48px;}
+  .cover{padding:52px 4px 36px;text-align:center}
+  .cover-tag{display:inline-block;font-size:11px;letter-spacing:.18em;color:var(--accent-deep);border:1px solid var(--line);padding:6px 14px;border-radius:999px;margin-bottom:22px;background:rgba(255,255,255,.6);}
+  .cover h1{font-size:25px;font-weight:600;line-height:1.45;letter-spacing:-.3px;margin-bottom:10px;}
+  .cover h1 span{display:block;font-size:14px;font-weight:400;color:var(--muted);letter-spacing:.05em;margin-top:8px}
+  .cover-line{width:36px;height:2px;background:var(--accent);margin:18px auto 22px;border-radius:2px}
+  .cover-intro{font-size:14px;color:var(--muted);line-height:1.9;max-width:340px;margin:0 auto 30px;}
+  .start-btn{display:inline-block;width:100%;max-width:300px;padding:16px 0;border:none;border-radius:16px;background:var(--accent-deep);color:#fff;font-size:15px;letter-spacing:.08em;font-weight:500;box-shadow:0 10px 22px rgba(143,128,114,.22);cursor:pointer;transition:transform .15s,opacity .15s;}
+  .start-btn:active{transform:scale(.97);opacity:.9}
+  .cover-note{font-size:11px;color:#bcb3ab;margin-top:16px}
+  .quiz{display:none;padding-top:20px}
+  .progress-wrap{margin-bottom:28px}
+  .progress-meta{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:8px}
+  .progress-bar{height:4px;background:var(--soft);border-radius:99px;overflow:hidden}
+  .progress-fill{height:100%;width:0;background:var(--accent);border-radius:99px;transition:width .25s ease}
+  .question-card{display:none;animation:fadeUp .22s ease}
+  .question-card.active{display:block}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .q-num{font-size:11px;letter-spacing:.16em;color:var(--accent-deep);margin-bottom:10px}
+  .q-title{font-size:17px;font-weight:600;line-height:1.55;margin-bottom:20px;letter-spacing:-.2px}
+  .options{display:flex;flex-direction:column;gap:10px}
+  .option{text-align:left;width:100%;padding:15px 16px;border-radius:14px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:14px;line-height:1.5;cursor:pointer;transition:all .15s;font-family:inherit;}
+  .option:active{transform:scale(.985)}
+  .option.selected{border-color:var(--accent-deep);background:#fbf8f5;box-shadow:0 0 0 1px var(--accent-deep) inset;}
+  .option .opt-index{color:var(--accent);font-weight:600;margin-right:6px;font-size:12px}
+  .next-btn{display:none;width:100%;margin-top:22px;padding:15px 0;border:none;border-radius:14px;background:var(--accent-deep);color:#fff;font-size:14px;letter-spacing:.1em;font-weight:500;cursor:pointer;font-family:inherit;}
+  .next-btn.show{display:block}
+  .next-btn:active{opacity:.9}
+  .result{display:none;padding-top:28px}
+  .result-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:28px 22px 24px;border:1px solid rgba(232,225,219,.7);}
+  .result-badge{display:inline-block;font-size:10px;letter-spacing:.2em;color:var(--accent-deep);background:var(--soft);padding:5px 12px;border-radius:999px;margin-bottom:18px;}
+  .result-city{font-size:28px;font-weight:600;letter-spacing:-.5px;line-height:1.3;margin-bottom:4px;}
+  .result-city small{font-size:12px;color:var(--muted);font-weight:400;letter-spacing:.1em;margin-left:6px}
+  .result-sub{font-size:12px;color:var(--muted);margin-bottom:20px;letter-spacing:.04em}
+  .result-divider{height:1px;background:var(--line);margin:20px 0}
+  .result-section-title{font-size:11px;letter-spacing:.16em;color:var(--accent-deep);margin-bottom:8px;font-weight:600;}
+  .result-text{font-size:14px;line-height:1.9;color:#5f5752}
+  .result-text + .result-section-title{margin-top:20px}
+  .result-tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:20px}
+  .tag{font-size:11px;color:var(--accent-deep);background:var(--soft);padding:5px 11px;border-radius:999px;letter-spacing:.02em;}
+  .result-foot{font-size:11px;color:#c0b7ae;text-align:center;margin-top:22px;line-height:1.8}
+  .restart-btn{display:block;width:100%;margin-top:24px;padding:15px 0;border:1px solid var(--line);border-radius:14px;background:transparent;color:var(--accent-deep);font-size:14px;letter-spacing:.1em;cursor:pointer;font-family:inherit;}
+  .restart-btn:active{background:var(--soft)}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- 封面 -->
+  <section class="cover" id="cover">
+    <div class="cover-tag">15 道题 · 现实宜居向</div>
+    <h1>测测你的本命定居城市<span>你最适合在哪长期定居？</span></h1>
+    <div class="cover-line"></div>
+    <p class="cover-intro">不看星座，不讲玄学。<br>只聊气候、节奏、食物、成本和你想过的日子。<br>选最接近你真实感受的那一项，<br>15 题后，看看哪座城接得住你。</p>
+    <button class="start-btn" onclick="startQuiz()">开始测试</button>
+    <div class="cover-note">50 座国内外城市 · 温柔匹配 · 适合截图收藏</div>
+  </section>
+
+  <!-- 答题 -->
+  <section class="quiz" id="quiz">
+    <div class="progress-wrap">
+      <div class="progress-meta"><span id="progressText">1 / 15</span><span id="progressPct">7%</span></div>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+    <div id="questionContainer"></div>
+  </section>
+
+  <!-- 结果 -->
+  <section class="result" id="result">
+    <div class="result-card">
+      <div class="result-badge">YOUR CITY MATCH</div>
+      <div class="result-city" id="cityName"></div>
+      <div class="result-sub" id="citySub"></div>
+      <div class="result-divider"></div>
+      <div class="result-section-title">宜居亮点</div>
+      <p class="result-text" id="cityHighlight"></p>
+      <div class="result-section-title">适合什么样的你</div>
+      <p class="result-text" id="cityPersonality"></p>
+      <div class="result-section-title">温柔提醒</div>
+      <p class="result-text" id="cityFlaw"></p>
+      <div class="result-tags" id="cityTags"></div>
+      <div class="result-foot">定居没有标准答案，<br>先选一个待着舒服的地方，再慢慢把日子过成自己的。</div>
+    </div>
+    <button class="restart-btn" onclick="resetQuiz()">重新测试</button>
+  </section>
+</div>
+
+<script>
+const DIMS = ['dry','lively','slow','lowcost','warm','food','tolerant','nature','metro','commuter','income','fourseason','quiet','intl','stability'];
+const QUESTIONS = [
+  {q:'你对“潮湿”的忍耐度，大概在哪个位置？',options:[{t:'完全不行，衣服晾不干会让我崩溃',v:{dry:1,warm:0.3,nature:-0.2}},{t:'有点难受，但除湿机开着也能过',v:{dry:0.5,warm:0.2}},{t:'还好，空气湿润一点皮肤反而舒服',v:{dry:-0.4,nature:0.3}},{t:'我很喜欢湿润，雨后青草味是加分项',v:{dry:-0.9,nature:0.6}}]},
+  {q:'下班后的晚上，你更想走进哪种场景？',options:[{t:'热闹的夜市或商圈，人多才有活着的感觉',v:{lively:1,quiet:-0.6,food:0.5}},{t:'家附近的咖啡馆或小酒馆，安静但不冷清',v:{lively:0.2,quiet:0.4,slow:0.5}},{t:'直接回家，做饭看书，社交电量已经用完',v:{quiet:1,lively:-0.8,slow:0.4}},{t:'去公园或江边走走，和自然待一会儿',v:{nature:1,quiet:0.5,lively:-0.2}}]},
+  {q:'关于通勤，你的真实底线是？',options:[{t:'超过30分钟我就要认真考虑搬家',v:{commuter:-1,lowcost:0.3}},{t:'45分钟左右可以接受，前提是地铁不挤到变形',v:{commuter:-0.2}},{t:'一小时以内都行，路上能听播客看书就还好',v:{commuter:0.6,slow:0.3}},{t:'只要住得舒服，通勤远一点我认了',v:{commuter:1,lowcost:0.4,nature:0.3}}]},
+  {q:'你理想中的“吃”，更接近哪一句？',options:[{t:'下楼就有好吃的，烟火气是生活的底色',v:{food:1,lively:0.5,slow:0.2}},{t:'食材新鲜、做法清淡，吃得舒服比吃得热闹重要',v:{food:0.5,nature:0.4,slow:0.3}},{t:'异国料理和精品餐厅不能少，味蕾需要新鲜感',v:{food:0.7,intl:1,metro:0.6}},{t:'对吃没有执念，能吃饱、不贵、干净就行',v:{food:-0.5,lowcost:0.8,slow:0.2}}]},
+  {q:'一年四季里，你最舍不得放弃的是？',options:[{t:'分明的四季，春天开花秋天落叶才有时间感',v:{fourseason:1,warm:-0.4}},{t:'漫长的夏天，阳光和短袖就是自由',v:{warm:1,fourseason:-0.5,dry:0.3}},{t:'凉爽的秋天，不冷不热刚刚好',v:{warm:0.3,fourseason:0.4,dry:0.4}},{t:'冬天就该冷，能看雪、能穿大衣才完整',v:{warm:-1,fourseason:0.8,dry:0.3}}]},
+  {q:'你对“热闹”的需求，更像哪一种？',options:[{t:'我需要城市感，人流量和灯火让我安心',v:{lively:0.9,metro:0.8,quiet:-0.8}},{t:'偶尔热闹可以，但日常最好安静一点',v:{lively:0.1,quiet:0.7,metro:0.2}},{t:'我更喜欢小城那种熟人社会的温度',v:{quiet:0.8,lively:-0.3,metro:-0.7,stability:0.6}},{t:'热闹和安静我都要，最好半小时内能切换',v:{lively:0.4,quiet:0.3,metro:0.5,tolerant:0.4}}]},
+  {q:'说到定居成本，你的态度是？',options:[{t:'房价和物价必须友好，我不想被生活成本追着跑',v:{lowcost:1,income:-0.5,slow:0.4}},{t:'可以贵一点，但收入要跟得上，我不想纯省钱',v:{lowcost:-0.3,income:0.8,metro:0.6}},{t:'我愿意为气候和自然环境支付溢价',v:{lowcost:-0.6,nature:0.9,warm:0.4}},{t:'平衡就好，不追求最低，也不接受被收割',v:{lowcost:0.3,income:0.2,stability:0.5}}]},
+  {q:'你对一座城市“包容度”的期待是？',options:[{t:'很重要，我希望与众不同不会被侧目',v:{tolerant:1,intl:0.5,metro:0.4}},{t:'比较重要，至少大家各过各的、互不打扰',v:{tolerant:0.6,quiet:0.4}},{t:'一般，我更在意生活本身舒不舒服',v:{tolerant:0,stability:0.5}},{t:'不太在意，我适应力还行，到哪都能过',v:{tolerant:-0.3,commuter:0.3}}]},
+  {q:'自然在你日常生活中的权重是？',options:[{t:'必须有山或海，推开窗看不到绿色我会低落',v:{nature:1,metro:-0.4,warm:0.3}},{t:'周末能去公园或郊外就够了',v:{nature:0.5,metro:0.2}},{t:'城市便利更重要，自然偶尔去一次就行',v:{nature:-0.5,metro:0.8,lively:0.4}},{t:'我喜欢下班就能散步到水边或山脚下的感觉',v:{nature:0.8,slow:0.5,quiet:0.4}}]},
+  {q:'你更向往哪种城市尺度？',options:[{t:'大城市，地铁密集、机会多、什么都有',v:{metro:1,lively:0.7,income:0.5,commuter:0.4}},{t:'中型城市，该有的都有，但不至于大到累',v:{metro:0.2,stability:0.6,lowcost:0.3}},{t:'小城或小镇，走路就能到常去的地方',v:{metro:-1,slow:0.7,quiet:0.7,lowcost:0.5}},{t:'城市大小无所谓，气候和自然才是决定项',v:{metro:-0.2,nature:0.8,warm:0.4}}]},
+  {q:'你对“慢节奏”的真实感受是？',options:[{t:'我太需要了，慢下来我才觉得在生活',v:{slow:1,lively:-0.3,lowcost:0.4}},{t:'喜欢慢，但也不能完全没有活力和机会',v:{slow:0.4,metro:0.3,income:0.2}},{t:'我习惯快节奏，太慢我会焦虑',v:{slow:-0.8,metro:0.7,lively:0.6}},{t:'节奏不重要，重要的是我能不能掌控自己的时间',v:{slow:0.2,stability:0.5,commuter:0.3}}]},
+  {q:'关于收入和生活成本，你更接近？',options:[{t:'收入不用很高，但物价和房租一定要低',v:{lowcost:1,income:-0.4,slow:0.5}},{t:'我希望收入有成长空间，辛苦一点也值得',v:{income:0.9,metro:0.6,commuter:0.4}},{t:'够用就好，我更想用时间换生活质量',v:{slow:0.7,lowcost:0.5,income:-0.2}},{t:'我希望收入中上，同时生活成本别太离谱',v:{income:0.4,lowcost:0.2,stability:0.5}}]},
+  {q:'你理想中的周末，更常出现哪一幕？',options:[{t:'逛展、探店、看演出，城市就是游乐场',v:{lively:0.7,metro:0.8,intl:0.5,food:0.4}},{t:'去海边或山里，晒一天太阳什么都不想',v:{nature:1,warm:0.5,slow:0.6,quiet:0.3}},{t:'在家附近散步、买菜、做饭，安安稳稳',v:{quiet:0.8,slow:0.7,lowcost:0.3}},{t:'约朋友吃饭聊天，或者参加兴趣社群',v:{lively:0.4,tolerant:0.5,food:0.5,metro:0.3}}]},
+  {q:'如果只能保留一个，你选？',options:[{t:'阳光充足、干燥少雨的气候',v:{dry:1,warm:0.6,nature:0.2}},{t:'湿润温和、四季有绿意的气候',v:{dry:-0.6,warm:0.4,nature:0.5}},{t:'四季分明、冬天有冬天的样子',v:{fourseason:1,warm:-0.6,dry:0.3}},{t:'常年凉爽，不用经历酷暑和严寒',v:{warm:0.2,fourseason:-0.2,nature:0.3,stability:0.4}}]},
+  {q:'说到“定居”，你心里最看重的是？',options:[{t:'安全感：秩序、医疗、生活稳定',v:{stability:1,lowcost:0.3,tolerant:0.2}},{t:'自由度：我可以按自己的方式生活',v:{tolerant:1,intl:0.6,quiet:0.3}},{t:'可能性：工作、收入、未来的空间',v:{income:0.9,metro:0.8,lively:0.5}},{t:'舒适感：气候、食物、日常的幸福感',v:{nature:0.6,food:0.5,slow:0.6,warm:0.3}}]}
+];
+
+const CITIES = [
+  {name:'昆明',sub:'云南 · 国内',profile:{dry:0.2,lively:0.2,slow:0.8,lowcost:0.4,warm:0.7,food:0.5,tolerant:0.5,nature:0.8,metro:-0.1,commuter:0.2,income:-0.2,fourseason:-0.3,quiet:0.5,intl:0.1,stability:0.5},highlight:'年均温15℃左右，夏天不用空调、冬天不用缩手缩脚，滇池的风和西山的光把日子调成了恒温模式。菜市场里鲜花比菜还便宜，傍晚在盘龙江边散步，时间会自己慢下来。',personality:'适合对气候敏感、不想把精力花在和天气对抗上的人。喜欢花、喜欢散步、喜欢“不赶”的生活节奏，昆明会很接得住你。',flaw:'紫外线不客气，雨季湿气也在线；产业结构偏传统，如果对收入和职业天花板有很高期待，可能会觉得“舒服但不够闯”。',tags:['四季如春','花城','慢生活','气候友好']},
+  {name:'大理',sub:'云南 · 国内',profile:{dry:0.3,lively:-0.1,slow:1,lowcost:0.6,warm:0.6,food:0.3,tolerant:0.7,nature:1,metro:-1,commuter:0.8,income:-0.7,fourseason:-0.2,quiet:0.8,intl:0.4,stability:-0.1},highlight:'苍山洱海之间，时间单位不是小时而是日出和日落。房租和物价对想过简单生活的人很友好，咖啡馆密度却意外地高，适合把生活半径缩到步行范围。',personality:'适合自由职业、远程工作、或者阶段性想从轨道上下来喘口气的人。你要能接受“效率不那么高”，才能接住这里的松弛。',flaw:'就业机会少，收入天花板低；旅游旺季人多，医疗和公共交通别按大城市的预期来。',tags:['苍山洱海','低物欲','自由职业','自然系']},
+  {name:'成都',sub:'四川 · 国内',profile:{dry:-0.3,lively:0.7,slow:0.8,lowcost:0.5,warm:0.3,food:1,tolerant:0.7,nature:0.5,metro:0.7,commuter:0.1,income:0.3,fourseason:0.2,quiet:0.2,intl:0.4,stability:0.5},highlight:'火锅店比便利店还密，茶馆里能坐一下午。城市便利度和烟火气同时在线，收入机会在西南也算能打，属于“既能挣钱又能过日子”的少数派。',personality:'适合喜欢热闹但不喜欢紧绷的人。你不需要很有钱才能融入，一碗面、一杯茶就能找到自己的位置。',flaw:'冬天湿冷、夏天闷热，日照偏少；高峰堵车和热门区域的人流是日常，潮湿敏感的人要掂量一下。',tags:['巴适','美食天堂','烟火气','茶馆']},
+  {name:'重庆',sub:'重庆 · 国内',profile:{dry:-0.4,lively:0.9,slow:0.4,lowcost:0.6,warm:0.4,food:0.9,tolerant:0.6,nature:0.4,metro:0.8,commuter:0.2,income:0.3,fourseason:0.3,quiet:-0.3,intl:0.2,stability:0.3},highlight:'立体城市，轻轨穿楼、江景免费。物价在直辖市里算温柔，小面和火锅能把日常幸福感拉得很高，夜生活密度惊人。',personality:'适合喜欢城市感和烟火气、不怕爬坡上坎的人。你要的是“热闹地活着”，重庆不会让你冷场。',flaw:'夏天湿热到黏，地形费腿，通勤有时候不是距离远而是“看着近走起来远”；对潮湿敏感的人会比较辛苦。',tags:['8D城市','火锅','江景','夜生活']},
+  {name:'广州',sub:'广东 · 国内',profile:{dry:-0.3,lively:0.8,slow:0.4,lowcost:0.1,warm:0.9,food:1,tolerant:0.8,nature:0.3,metro:0.9,commuter:0,income:0.7,fourseason:-0.4,quiet:-0.1,intl:0.6,stability:0.5},highlight:'一线城市里生活成本相对友好的那个，医疗、交通、美食几乎没有短板。早茶可以从清晨吃到中午，城市对“不同活法”的接受度在国内算高的。',personality:'适合既想要机会和便利、又不想被高昂成本压到窒息的人。喜欢湿热、喜欢老城烟火、喜欢“慢慢叹”的人会尤其舒服。',flaw:'回南天和漫长夏季是真实存在的；通勤时间不短，核心区房租也不便宜。',tags:['早茶','一线性价比','包容','湿热']},
+  {name:'深圳',sub:'广东 · 国内',profile:{dry:-0.2,lively:0.9,slow:-0.6,lowcost:-0.7,warm:0.8,food:0.3,tolerant:0.8,nature:0.3,metro:1,commuter:-0.2,income:1,fourseason:-0.5,quiet:-0.4,intl:0.8,stability:-0.2},highlight:'搞钱和山海可以同时存在，城市界面新、办事效率高，公园和海滨栈道比想象中多。适合把事业放在生活前面的人。',personality:'适合目标感强、能接受高成本和高强度的人。如果你享受“可能性”多过“安逸”，深圳的节奏会对味。',flaw:'房租和日常开销高，通勤时间长；气候湿热，生活感容易被工作挤压。',tags:['搞钱','山海','效率','年轻']},
+  {name:'杭州',sub:'浙江 · 国内',profile:{dry:-0.1,lively:0.5,slow:0.4,lowcost:-0.3,warm:0.3,food:0.4,tolerant:0.6,nature:0.8,metro:0.8,commuter:0.1,income:0.7,fourseason:0.5,quiet:0.3,intl:0.5,stability:0.5},highlight:'西湖是面子，数字经济和产业是里子。城市界面干净，自然和城市切换得很顺，适合既想要工作空间、又不想牺牲周末绿意的人。',personality:'适合对“平衡”有执念的人：既不想躺平，也不想只有工作。杭州的舒服在于，它允许你两种状态切换。',flaw:'房价和租金不低，梅雨季潮湿，夏季闷热；热门区域人多，通勤压力在核心区比较明显。',tags:['西湖','数字经济','平衡','江南']},
+  {name:'苏州',sub:'江苏 · 国内',profile:{dry:-0.1,lively:0.3,slow:0.6,lowcost:-0.1,warm:0.2,food:0.5,tolerant:0.5,nature:0.7,metro:0.6,commuter:0.3,income:0.4,fourseason:0.6,quiet:0.5,intl:0.4,stability:0.7},highlight:'古城限高，园林和河道藏在日常里，生活节奏比上海慢半拍，但高铁到上海不到半小时。属于“想安静又不想脱节”的折中选择。',personality:'适合喜欢江南底蕴、又需要城市配套的人。你可以过得很慢，但随时能接入大城市的资源。',flaw:'梅雨季潮湿，房价不算低；古城区的便利度和停车体验要有心理准备。',tags:['园林','江南','进退自如','慢半拍']},
+  {name:'南京',sub:'江苏 · 国内',profile:{dry:0,lively:0.5,slow:0.4,lowcost:-0.1,warm:0.1,food:0.5,tolerant:0.6,nature:0.5,metro:0.7,commuter:0.3,income:0.5,fourseason:0.8,quiet:0.4,intl:0.4,stability:0.6},highlight:'梧桐、城墙、大学城，城市气质偏沉静但配套很扎实。医疗和教育资源厚，适合把“长期过日子”放在第一位的人。',personality:'适合喜欢历史感、又不想放弃城市便利的人。节奏不快不慢，刚好够你把生活安顿下来。',flaw:'夏天闷热、冬天湿冷，四季分明也意味着两头要熬一熬；房价在长三角不算低。',tags:['梧桐','历史感','医疗教育','四季分明']},
+  {name:'扬州',sub:'江苏 · 国内',profile:{dry:0.1,lively:0.1,slow:0.9,lowcost:0.5,warm:0.1,food:0.7,tolerant:0.4,nature:0.6,metro:-0.5,commuter:0.6,income:-0.3,fourseason:0.6,quiet:0.7,intl:0.1,stability:0.8},highlight:'“早上皮包水，晚上水包皮”不是段子，是日常。城市限高，没有高楼压迫感，淮扬菜和早茶把日子调得温温吞吞。',personality:'适合真心想慢下来、不介意城市规模小的人。你要的是“过日子”而不是“闯一闯”，扬州会很合拍。',flaw:'就业机会和收入水平有限，年轻人可能觉得缺乏冲劲；梅雨季潮湿，冬季偏冷。',tags:['早茶','慢生活','低压力','淮扬菜']},
+  {name:'无锡',sub:'江苏 · 国内',profile:{dry:0.1,lively:0.3,slow:0.6,lowcost:0.2,warm:0.2,food:0.6,tolerant:0.4,nature:0.7,metro:0.4,commuter:0.4,income:0.3,fourseason:0.6,quiet:0.5,intl:0.3,stability:0.7},highlight:'太湖边上的均衡型选手，城市不大但配套齐全，物价和房价在苏南相对温柔。酱排骨和湖鲜能把日常伙食标准拉高。',personality:'适合不想太卷、但又需要一定城市功能的人。无锡的好是“不声张的舒服”。',flaw:'梅雨季潮湿，夏天闷热；产业结构偏传统，高薪机会不如一线和新一线头部。',tags:['太湖','均衡','苏南性价比','湖鲜']},
+  {name:'青岛',sub:'山东 · 国内',profile:{dry:0.4,lively:0.4,slow:0.5,lowcost:0.2,warm:-0.2,food:0.6,tolerant:0.5,nature:0.8,metro:0.4,commuter:0.4,income:0.1,fourseason:0.7,quiet:0.4,intl:0.3,stability:0.6},highlight:'红瓦绿树、碧海蓝天，夏天最热的时候也就二十几度。海鲜市场热闹，鲜啤配蛤蜊是日常，北方滨海城市里气候和城市感平衡得很好。',personality:'适合怕酷暑、喜欢海、又不想城市太小的北方人。青岛的舒服是“有海但不荒”。',flaw:'冬天海风大、体感冷；旅游旺季人多，薪资水平比南方同级别城市偏保守。',tags:['红瓦绿树','海鲜','避暑','滨海']},
+  {name:'大连',sub:'辽宁 · 国内',profile:{dry:0.4,lively:0.3,slow:0.5,lowcost:0.4,warm:-0.3,food:0.5,tolerant:0.5,nature:0.8,metro:0.3,commuter:0.5,income:-0.2,fourseason:0.7,quiet:0.5,intl:0.3,stability:0.7},highlight:'北方滨海城市的性价比代表，海洋性气候让冬天不酷寒、夏天不燥热。有轨电车、海岸线和广场把城市气质拉得很舒展，房价门槛比多数南方海滨城市温柔。',personality:'适合怕热、喜欢海、又希望生活成本可控的人。大连属于“不惊艳但很耐住”的类型。',flaw:'冬季海风冷，经济活力和高薪机会不如一线和新一线；年轻人外流是现实。',tags:['北方滨海','性价比','有轨电车','耐住']},
+  {name:'威海',sub:'山东 · 国内',profile:{dry:0.4,lively:0,slow:0.7,lowcost:0.5,warm:-0.3,food:0.4,tolerant:0.4,nature:0.9,metro:-0.6,commuter:0.8,income:-0.4,fourseason:0.7,quiet:0.8,intl:0.2,stability:0.8},highlight:'干净、安静、海岸线长，空气质量常年在线。城市不大，通勤压力小，海景房的门槛比多数滨海城市低，适合把生活半径缩到“家—海—菜市场”。',personality:'适合喜欢安静、对自然要求高、不太依赖大城市热闹的人。威海的好需要你愿意慢下来才能看见。',flaw:'就业机会少、收入水平不高；冬天风大，年轻人可能觉得“太静了”。',tags:['干净','安静','海岸线','低通勤']},
+  {name:'烟台',sub:'山东 · 国内',profile:{dry:0.4,lively:0.2,slow:0.6,lowcost:0.4,warm:-0.2,food:0.5,tolerant:0.4,nature:0.7,metro:-0.2,commuter:0.6,income:-0.2,fourseason:0.7,quiet:0.6,intl:0.2,stability:0.7},highlight:'没有极端短板的均衡型滨海城市，海岸线优质、物产丰富，房价和生活压力相对友好。苹果、樱桃和海鲜让日常饮食很有幸福感。',personality:'适合不追求某一方面极致、只想要“样样都还行”的人。烟台属于踏实过日子的选择。',flaw:'城市活力和高薪机会一般；冬季有雪有风，喜欢热闹的人可能觉得平。',tags:['均衡','水果','海鲜','实在']},
+  {name:'厦门',sub:'福建 · 国内',profile:{dry:-0.2,lively:0.4,slow:0.6,lowcost:-0.4,warm:0.8,food:0.5,tolerant:0.6,nature:0.9,metro:0.3,commuter:0.5,income:0.1,fourseason:-0.3,quiet:0.4,intl:0.4,stability:0.6},highlight:'海岛城市，冬天温暖，鼓浪屿和环岛路把浪漫写进了日常。城市精致度高，适合对“生活美感”有要求的人。',personality:'适合怕冷、喜欢海、愿意为环境和氛围支付溢价的人。厦门的好是“看着就舒服”。',flaw:'岛内房价高，收入水平与房价不太匹配；夏季湿热，旅游旺季拥挤。',tags:['海岛','温暖','精致','浪漫']},
+  {name:'珠海',sub:'广东 · 国内',profile:{dry:-0.2,lively:0.2,slow:0.6,lowcost:-0.2,warm:0.9,food:0.4,tolerant:0.6,nature:0.8,metro:0.2,commuter:0.5,income:0.2,fourseason:-0.4,quiet:0.6,intl:0.4,stability:0.7},highlight:'粤港澳的后花园，空气质量常年靠前，情侣路和海风把城市节奏吹得很松。城市不大但配套不差，去广州、澳门都方便。',personality:'适合怕冷、喜欢海、想要“安静但不偏僻”的人。珠海属于宜居榜上的稳定选手。',flaw:'回南天潮湿，产业厚度和收入上限不如广深；夏季台风需要习惯。',tags:['海风','空气好','后花园','安稳']},
+  {name:'福州',sub:'福建 · 国内',profile:{dry:-0.3,lively:0.4,slow:0.5,lowcost:0.3,warm:0.7,food:0.5,tolerant:0.4,nature:0.6,metro:0.3,commuter:0.5,income:0,fourseason:0.2,quiet:0.5,intl:0.2,stability:0.6},highlight:'温泉、榕树和闽江，城市节奏不快，物价在省会里算温和。福州的好是“不太被注意到的舒服”，适合不想挤在聚光灯下的人。',personality:'适合喜欢湿润温暖、追求生活成本可控的人。你不需要城市给你太多戏剧性，福州刚好。',flaw:'夏季湿热，存在感不如厦门；高薪产业和国际化程度有限。',tags:['温泉','榕树','低调','成本友好']},
+  {name:'长沙',sub:'湖南 · 国内',profile:{dry:-0.1,lively:0.9,slow:0.3,lowcost:0.5,warm:0.4,food:1,tolerant:0.5,nature:0.3,metro:0.6,commuter:0.3,income:0.2,fourseason:0.5,quiet:-0.3,intl:0.3,stability:0.4},highlight:'夜生活、美食和娱乐浓度极高，房价在省会城市里出了名的友好。年轻人多，城市有种“不贵但很嗨”的气质。',personality:'适合喜欢热闹、爱吃辣、想要城市活力但不想被房价劝退的人。长沙的快乐很直接。',flaw:'夏天湿热、冬天湿冷，气候体验不算温柔；产业以文娱和消费见长，高薪技术岗位密度不如沿海。',tags:['夜生活','美食','房价友好','年轻']},
+  {name:'武汉',sub:'湖北 · 国内',profile:{dry:-0.1,lively:0.7,slow:0.2,lowcost:0.3,warm:0.2,food:0.7,tolerant:0.5,nature:0.4,metro:0.8,commuter:0.2,income:0.4,fourseason:0.6,quiet:0.1,intl:0.3,stability:0.5},highlight:'九省通衢，交通和高校资源极强，城市体量大、烟火气足。过早文化丰富，生活成本在一线和新一线之间算有性价比。',personality:'适合需要城市便利、医疗教育资源和热闹氛围的人。武汉有种“粗粝但旺盛”的生命力。',flaw:'夏天酷热、冬天湿冷，气候是明显的短板；城市大，跨区通勤和时间成本不低。',tags:['过早','交通枢纽','高校','烟火气']},
+  {name:'贵阳',sub:'贵州 · 国内',profile:{dry:0.2,lively:0.3,slow:0.7,lowcost:0.6,warm:-0.2,food:0.6,tolerant:0.4,nature:0.9,metro:-0.1,commuter:0.5,income:-0.2,fourseason:0.1,quiet:0.6,intl:0.1,stability:0.6},highlight:'“爽爽的贵阳”不是白叫的，夏季平均二十几度，森林覆盖率高，空气质量好。物价和房价对年轻人友好，大数据产业也在带来新的工作机会。',personality:'适合怕热、喜欢山和绿意、对生活成本敏感的人。贵阳属于“避暑+过日子”的组合。',flaw:'冬季阴冷潮湿，日照偏少；城市规模和收入水平有限，喜欢大海和开阔感的人可能觉得憋。',tags:['避暑','森林城市','低物价','山城']},
+  {name:'南宁',sub:'广西 · 国内',profile:{dry:-0.3,lively:0.5,slow:0.6,lowcost:0.5,warm:0.9,food:0.6,tolerant:0.5,nature:0.6,metro:0.3,commuter:0.5,income:-0.1,fourseason:-0.4,quiet:0.4,intl:0.2,stability:0.6},highlight:'绿城不是虚名，冬天温暖、满城绿意，水果和米粉把日常幸福感拉得很高。生活成本友好，节奏不快。',personality:'适合怕冷、喜欢绿植和热带水果、追求低成本舒适生活的人。南宁的舒服是“不费力”的。',flaw:'夏天漫长湿热，回南天也跑不掉；高薪机会和城市国际化程度有限。',tags:['绿城','温暖','水果自由','低成本']},
+  {name:'海口',sub:'海南 · 国内',profile:{dry:-0.2,lively:0.3,slow:0.7,lowcost:0.2,warm:1,food:0.5,tolerant:0.5,nature:0.8,metro:-0.2,commuter:0.6,income:-0.1,fourseason:-0.7,quiet:0.5,intl:0.3,stability:0.6},highlight:'冬天可以穿短袖，海风和椰子树是日常背景。生活节奏慢，适合对“温暖”有执念的人。',personality:'适合怕冷、喜欢海、想要把冬天从人生里删掉的人。海口的好是气候给的。',flaw:'夏季漫长湿热，台风季需要习惯；就业结构偏旅游和服务业，收入天花板不高。',tags:['暖冬','椰风','海岛','慢节奏']},
+  {name:'西安',sub:'陕西 · 国内',profile:{dry:0.6,lively:0.6,slow:0.3,lowcost:0.4,warm:-0.2,food:0.8,tolerant:0.4,nature:0.3,metro:0.7,commuter:0.3,income:0.2,fourseason:0.8,quiet:0.2,intl:0.3,stability:0.6},highlight:'碳水之都，面食和夜市能把日常幸福感拉满。高校和医疗资源厚，城市文化底蕴深，房价在北方省会里不算夸张。',personality:'适合喜欢热闹、爱吃面食、对四季分明有执念的人。西安有种“稳中带热闹”的踏实感。',flaw:'冬天干燥寒冷、夏天炎热，气候不算温柔；产业结构偏传统和军工，部分行业机会有限。',tags:['碳水','夜市','四季分明','底蕴']},
+  {name:'兰州',sub:'甘肃 · 国内',profile:{dry:0.9,lively:0.2,slow:0.5,lowcost:0.6,warm:-0.4,food:0.7,tolerant:0.3,nature:0.5,metro:0.1,commuter:0.5,income:-0.3,fourseason:0.7,quiet:0.6,intl:0.1,stability:0.7},highlight:'干燥、日照足，牛肉面是刻进日常的仪式感。生活成本低，城市沿着黄河展开，有一种西北特有的开阔和实在。',personality:'适合讨厌潮湿、喜欢面食、对低成本生活有需求的人。兰州的舒服是“不花哨但踏实”。',flaw:'气候偏干，冬天冷，风沙天存在；经济活力和高薪机会有限。',tags:['干燥','牛肉面','低成本','黄河']},
+  {name:'乌鲁木齐',sub:'新疆 · 国内',profile:{dry:1,lively:0.2,slow:0.5,lowcost:0.6,warm:-0.5,food:0.7,tolerant:0.3,nature:0.5,metro:0.1,commuter:0.6,income:-0.2,fourseason:0.8,quiet:0.6,intl:0.1,stability:0.7},highlight:'干燥、不潮湿，冬天有厚雪、室内暖气足。新疆美食密度高，生活设施齐全，适合讨厌回南天和湿冷的人。',personality:'适合喜欢干燥、面食和羊肉、不介意距离感的人。乌鲁木齐的日常幸福感很大一部分来自食物和暖气。',flaw:'离内地远，机票成本和时间成本高；冬季寒冷，气候干燥需要适应。',tags:['干燥','新疆美食','暖气','雪']},
+  {name:'里斯本',sub:'葡萄牙 · 国外',profile:{dry:0.7,lively:0.4,slow:0.7,lowcost:0.3,warm:0.7,food:0.5,tolerant:0.8,nature:0.6,metro:0.4,commuter:0.5,income:-0.1,fourseason:0.1,quiet:0.4,intl:0.9,stability:0.6},highlight:'在欧洲首都里生活成本算温柔，阳光足、空气好，安全评分高于巴黎和罗马。tram和瓷砖外墙把城市气质拉得很松弛，适合想把日子过慢的人。',personality:'适合喜欢阳光、想用较低成本体验欧洲生活、不追求“顶级收入”的人。里斯本的好是“体面的松弛”。',flaw:'旅游热度推高了部分区域房租，收入水平在西欧偏低；葡语是长期融入的坎。',tags:['欧洲性价比','阳光','安全','松弛']},
+  {name:'波尔图',sub:'葡萄牙 · 国外',profile:{dry:0.6,lively:0.3,slow:0.8,lowcost:0.5,warm:0.6,food:0.5,tolerant:0.7,nature:0.6,metro:0.1,commuter:0.7,income:-0.3,fourseason:0.1,quiet:0.6,intl:0.7,stability:0.7},highlight:'比里斯本更小、更安静，生活花销更低，葡萄酒和河岸把日常幸福感拉得很具体。城市精致但不端着，适合想过“小而美”生活的人。',personality:'适合喜欢步行、喜欢安静、对大城市热闹没有执念的人。波尔图属于“慢慢喜欢上”的类型。',flaw:'就业机会少、收入偏低；雨季潮湿，冬天偏冷。',tags:['小而美','低花销','河岸','安静']},
+  {name:'马德里',sub:'西班牙 · 国外',profile:{dry:0.8,lively:0.8,slow:0.4,lowcost:0.2,warm:0.6,food:0.7,tolerant:0.8,nature:0.3,metro:0.7,commuter:0.4,income:0.1,fourseason:0.4,quiet:-0.2,intl:0.8,stability:0.6},highlight:'阳光充足、干燥少雨，夜生活和美食密度极高。城市对移民友好，华人社区成熟，属于“热闹又不太贵”的欧洲首都选项。',personality:'适合喜欢社交、晚睡、干燥气候和城市活力的人。马德里的日子是“热热闹闹地过”。',flaw:'夏季高温，中午晒得厉害；收入水平在西欧不算高，租房市场近年偏紧。',tags:['阳光','夜生活','友好','干燥']},
+  {name:'巴塞罗那',sub:'西班牙 · 国外',profile:{dry:0.7,lively:0.8,slow:0.4,lowcost:0.1,warm:0.8,food:0.7,tolerant:0.9,nature:0.7,metro:0.7,commuter:0.3,income:0.1,fourseason:0.2,quiet:-0.2,intl:0.9,stability:0.5},highlight:'地中海气候，阳光、沙滩和高迪建筑把城市变成日常背景。国际化程度高，对多元生活方式的包容度在欧洲靠前。',personality:'适合喜欢海、喜欢热闹、想要“城市+自然”双在线的人。巴塞罗那的能量很足。',flaw:'旅游过热推高房租，热门区域拥挤；加泰罗尼亚语和西班牙语的双语环境需要适应。',tags:['地中海','高迪','包容','城市海滩']},
+  {name:'阿姆斯特丹',sub:'荷兰 · 国外',profile:{dry:0.2,lively:0.6,slow:0.4,lowcost:-0.4,warm:-0.2,food:0.3,tolerant:1,nature:0.6,metro:0.5,commuter:0.4,income:0.5,fourseason:0.5,quiet:0.2,intl:1,stability:0.7},highlight:'安全、医疗优质、空气干净，骑车文化让日常通勤变成一种轻度运动。对多元生活方式的包容度极高，英语普及率也高。',personality:'适合重视自由、包容和城市便利、不介意多雨天气的人。阿姆斯特丹的舒服是“各过各的，但设施很到位”。',flaw:'住房紧张、房租高，阴雨天多；冬季风大湿冷。',tags:['包容','骑行','安全','英语友好']},
+  {name:'维也纳',sub:'奥地利 · 国外',profile:{dry:0.2,lively:0.4,slow:0.7,lowcost:0.1,warm:-0.1,food:0.4,tolerant:0.7,nature:0.6,metro:0.6,commuter:0.6,income:0.3,fourseason:0.6,quiet:0.5,intl:0.7,stability:0.9},highlight:'医疗和公共交通在全世界都排得上号，城市安全、干净、秩序感强。咖啡馆和古典音乐把日常调得很有质感，适合追求稳定生活的人。',personality:'适合重视医疗、秩序和长期稳定的人。你不需要城市天天给你刺激，维也纳会给你“踏实的好”。',flaw:'冬天阴冷，城市气质偏“安静克制”；德语是长期生活绕不开的门槛。',tags:['医疗强','秩序','咖啡馆','稳定']},
+  {name:'柏林',sub:'德国 · 国外',profile:{dry:0.2,lively:0.8,slow:0.3,lowcost:0.3,warm:-0.3,food:0.3,tolerant:1,nature:0.5,metro:0.7,commuter:0.4,income:0.1,fourseason:0.5,quiet:-0.1,intl:0.9,stability:0.5},highlight:'欧洲最包容、最“不端着”的首都之一，房租在西欧大都市里算友好。亚文化、艺术和夜生活密度极高，适合不想被单一活法定义的人。',personality:'适合重视自由、喜欢多元文化、能接受阴冷冬天和一定混乱感的人。柏林的好是“你可以奇怪，没人管你”。',flaw:'冬天阴冷漫长，租房竞争激烈；德语在行政和日常生活中很重要。',tags:['自由','亚文化','房租友好','多元']},
+  {name:'慕尼黑',sub:'德国 · 国外',profile:{dry:0.3,lively:0.4,slow:0.6,lowcost:-0.3,warm:-0.2,food:0.4,tolerant:0.6,nature:0.8,metro:0.5,commuter:0.6,income:0.5,fourseason:0.7,quiet:0.6,intl:0.6,stability:0.8},highlight:'阿尔卑斯山就在不远处，城市干净、安全、医疗和教育优质。啤酒花园和公园让“城市生活”和“自然”切换得很顺。',personality:'适合喜欢秩序、自然和稳定、不追求夜生活刺激的人。慕尼黑属于“贵但省心”的选择。',flaw:'房租和物价在德国偏高；城市气质偏保守，冬天冷。',tags:['阿尔卑斯','秩序','安全','自然']},
+  {name:'苏黎世',sub:'瑞士 · 国外',profile:{dry:0.2,lively:0.3,slow:0.6,lowcost:-1,warm:-0.2,food:0.4,tolerant:0.7,nature:0.9,metro:0.3,commuter:0.8,income:0.8,fourseason:0.6,quiet:0.7,intl:0.8,stability:0.9},highlight:'湖光山色就在城市边缘，公共交通和医疗近乎教科书级别。收入水平高，城市极度安全、干净、有序。',personality:'适合高收入、重视自然和稳定、不介意高物价的人。苏黎世的好是“贵，但每分钱都落在体验上”。',flaw:'生活成本全球前列，租房和日常开销都很高；城市节奏安静克制，喜欢热闹的人会觉得闷。',tags:['湖光山色','高收入','极安全','高物价']},
+  {name:'哥本哈根',sub:'丹麦 · 国外',profile:{dry:0.1,lively:0.4,slow:0.6,lowcost:-0.5,warm:-0.3,food:0.5,tolerant:0.9,nature:0.6,metro:0.4,commuter:0.7,income:0.4,fourseason:0.5,quiet:0.6,intl:0.8,stability:0.8},highlight:'骑行、设计和新北欧料理把日常质感拉得很高，社会福利和安全感在线。城市不大，但公共空间和自然接触做得很细。',personality:'适合重视生活质感、社会福利和包容度、能接受漫长冬天的人。哥本哈根的好是“安静但精致”。',flaw:'冬天阴冷、日照短；物价和税率高，融入当地社交需要时间。',tags:['设计','骑行','福利','质感']},
+  {name:'斯德哥尔摩',sub:'瑞典 · 国外',profile:{dry:0.1,lively:0.3,slow:0.5,lowcost:-0.4,warm:-0.4,food:0.3,tolerant:0.8,nature:0.8,metro:0.4,commuter:0.7,income:0.4,fourseason:0.5,quiet:0.7,intl:0.8,stability:0.8},highlight:'群岛城市，自然和城市贴得很近，公共交通和福利体系扎实。城市气质安静、有序，适合喜欢“清冷感”的人。',personality:'适合耐得住冬天、喜欢自然和秩序、不依赖热闹社交的人。斯德哥尔摩的舒服是“干净而疏离”。',flaw:'冬季漫长阴冷，日照少；生活成本高，社交融入需要主动。',tags:['群岛','清冷','福利','自然']},
+  {name:'都柏林',sub:'爱尔兰 · 国外',profile:{dry:0.1,lively:0.6,slow:0.4,lowcost:-0.3,warm:0.1,food:0.3,tolerant:0.8,nature:0.7,metro:0.3,commuter:0.5,income:0.4,fourseason:0.3,quiet:0.3,intl:0.9,stability:0.6},highlight:'英语国家，酒吧文化和友善氛围让社交门槛较低。科技产业集中，城市不大但活力够，周边自然风光很能打。',personality:'适合想留在英语环境、喜欢音乐和酒吧文化、不介意多雨的人。都柏林的好是“热闹但不压迫”。',flaw:'房租高、住房紧张；天气多雨阴天，冬季风大。',tags:['英语','酒吧','科技','友善']},
+  {name:'伦敦',sub:'英国 · 国外',profile:{dry:0.1,lively:0.9,slow:0.1,lowcost:-0.8,warm:-0.1,food:0.6,tolerant:1,nature:0.4,metro:1,commuter:0,income:0.8,fourseason:0.4,quiet:-0.4,intl:1,stability:0.6},highlight:'几乎什么都有：工作机会、博物馆、各国料理、全球航线。包容度极高，你可以在这里找到任何生活方式的同类。',personality:'适合事业心强、喜欢城市浓度、不介意高成本和阴雨的人。伦敦是“用钱和精力换可能性”的地方。',flaw:'生活成本极高，通勤拥挤；天气阴雨多，租房市场紧张。',tags:['大都市','机会','包容','高成本']},
+  {name:'爱丁堡',sub:'英国 · 国外',profile:{dry:0.2,lively:0.5,slow:0.5,lowcost:-0.3,warm:-0.4,food:0.4,tolerant:0.8,nature:0.8,metro:0.2,commuter:0.7,income:0.2,fourseason:0.5,quiet:0.5,intl:0.8,stability:0.7},highlight:'古城、山海和艺术节把城市气质拉得很独特，城市规模适中，步行和公交就能覆盖日常。自然触手可及，适合喜欢“有山有海有文化”的人。',personality:'适合喜欢清冷美学、自然和安静、不追求大都市浓度的人。爱丁堡的好是“沉静但丰富”。',flaw:'冬天风大阴冷，日照短；就业机会和收入水平不如伦敦。',tags:['古城','山海','艺术节','清冷']},
+  {name:'墨尔本',sub:'澳大利亚 · 国外',profile:{dry:0.4,lively:0.7,slow:0.5,lowcost:-0.3,warm:0.3,food:0.7,tolerant:0.9,nature:0.7,metro:0.6,commuter:0.5,income:0.5,fourseason:0.5,quiet:0.3,intl:0.9,stability:0.8},highlight:'咖啡、艺术和体育把城市日常填得很满，华人社区成熟，文化多元。气候温和，自然和城市切换顺畅，连续多年在全球宜居榜前列。',personality:'适合喜欢咖啡文化、多元社会和“城市感但不窒息”的人。墨尔本的好是“丰富但不逼人”。',flaw:'天气一天四季，早晚温差大；房租和房价在澳洲主要城市里偏高。',tags:['咖啡','多元','华人社区','宜居榜']},
+  {name:'悉尼',sub:'澳大利亚 · 国外',profile:{dry:0.5,lively:0.7,slow:0.4,lowcost:-0.6,warm:0.6,food:0.6,tolerant:0.8,nature:0.9,metro:0.7,commuter:0.3,income:0.6,fourseason:0.3,quiet:0.2,intl:0.9,stability:0.8},highlight:'海港、沙滩和阳光是日常配置，城市界面漂亮，华人社区成熟。工作机会在澳洲属于头部，适合“既要事业又要海”的人。',personality:'适合喜欢海、阳光、城市便利和多元文化的人。悉尼的好是“视觉和机会都在线”。',flaw:'生活成本在澳洲最高档，房租贵、通勤距离长；夏季有山火风险。',tags:['海港','阳光','机会','高成本']},
+  {name:'布里斯班',sub:'澳大利亚 · 国外',profile:{dry:0.5,lively:0.4,slow:0.6,lowcost:-0.2,warm:0.8,food:0.4,tolerant:0.7,nature:0.7,metro:0.3,commuter:0.6,income:0.3,fourseason:0.2,quiet:0.5,intl:0.7,stability:0.8},highlight:'阳光充足、节奏比悉尼墨尔本慢，生活成本相对友好。离黄金海岸和自然都不远，适合想要“城市+户外”平衡的人。',personality:'适合怕冷、喜欢阳光和户外、不想卷大城市的人。布里斯班的好是“暖和但不急躁”。',flaw:'夏季湿热，偶尔有洪水风险；就业机会和国际化程度不如悉尼墨尔本。',tags:['阳光','慢节奏','户外','性价比']},
+  {name:'珀斯',sub:'澳大利亚 · 国外',profile:{dry:0.7,lively:0.2,slow:0.7,lowcost:0.1,warm:0.7,food:0.3,tolerant:0.6,nature:0.9,metro:0.1,commuter:0.8,income:0.4,fourseason:0.3,quiet:0.7,intl:0.6,stability:0.8},highlight:'地广人稀、阳光充足，海滩和自然空间管够。城市节奏慢，通勤压力小，适合“不想和人挤”的人。',personality:'适合喜欢安静、自然和干燥阳光、不介意“离哪儿都远”的人。珀斯的好是“宽敞和松弛”。',flaw:'地理位置孤立，回国或去东部城市飞行时间长；夏季炎热干燥。',tags:['阳光','地广人稀','安静','海滩']},
+  {name:'奥克兰',sub:'新西兰 · 国外',profile:{dry:0.2,lively:0.3,slow:0.7,lowcost:-0.3,warm:0.2,food:0.4,tolerant:0.8,nature:1,metro:0.2,commuter:0.6,income:0.1,fourseason:0.2,quiet:0.6,intl:0.7,stability:0.8},highlight:'火山、海湾和雨林把自然塞进城市日常，人口密度低，生活节奏松弛。社会福利和安全感在线，适合想把“自然接触”放在第一位的人。',personality:'适合喜欢户外、不追求高收入和高密度社交的人。奥克兰的好是“出门就是自然”。',flaw:'物价和房租偏高，收入水平不如澳洲；阴雨天多，娱乐和夜生活密度有限。',tags:['自然','低密度','福利','户外']},
+  {name:'温哥华',sub:'加拿大 · 国外',profile:{dry:0.2,lively:0.3,slow:0.6,lowcost:-0.7,warm:0.1,food:0.5,tolerant:0.9,nature:1,metro:0.4,commuter:0.5,income:0.3,fourseason:0.4,quiet:0.5,intl:0.8,stability:0.8},highlight:'山海之间，气候在加拿大算温和，华人社区成熟，中餐和亚洲超市密度高。自然和城市生活平衡得很好。',personality:'适合重视自然、华人生活便利和多元文化、不介意高房价的人。温哥华的好是“熟悉感和山海同时在线”。',flaw:'房价和房租极高，收入与房价的匹配度是长期痛点；冬季多雨阴天。',tags:['山海','华人便利','多元','高房价']},
+  {name:'多伦多',sub:'加拿大 · 国外',profile:{dry:0.1,lively:0.8,slow:0.3,lowcost:-0.6,warm:-0.3,food:0.7,tolerant:1,nature:0.5,metro:0.8,commuter:0.2,income:0.6,fourseason:0.6,quiet:-0.1,intl:0.9,stability:0.7},highlight:'加拿大最多元、最有城市感的选项，各国料理和社区文化密度高，工作机会在加拿大属于头部。华人社区成熟，生活便利。',personality:'适合喜欢城市浓度、多元文化和机会、能接受漫长冬天的人。多伦多的好是“世界在这里”。',flaw:'冬天冷且长，房租和房价高，通勤压力大。',tags:['多元','城市感','机会','冬天长']},
+  {name:'卡尔加里',sub:'加拿大 · 国外',profile:{dry:0.6,lively:0.2,slow:0.6,lowcost:-0.1,warm:-0.6,food:0.3,tolerant:0.6,nature:0.8,metro:0.1,commuter:0.7,income:0.5,fourseason:0.7,quiet:0.7,intl:0.5,stability:0.8},highlight:'落基山就在旁边，阳光充足、干燥，城市干净、通勤压力小。收入水平在加拿大不错，房价相对温哥华多伦多温柔很多。',personality:'适合喜欢山、干燥、安静和户外、能接受寒冷冬天的人。卡尔加里的好是“实在和开阔”。',flaw:'冬天寒冷且有寒潮，城市规模小，夜生活和多元文化密度不如大城市。',tags:['落基山','干燥','通勤短','户外']},
+  {name:'新加坡',sub:'新加坡 · 国外',profile:{dry:-0.1,lively:0.8,slow:0.2,lowcost:-0.5,warm:1,food:0.8,tolerant:0.8,nature:0.5,metro:0.9,commuter:0.4,income:0.8,fourseason:-0.8,quiet:0.1,intl:1,stability:0.9},highlight:'华人文化熟悉度高、双语环境、安全和办事效率极强。城市干净、公共交通和医疗优质，食阁文化让日常吃饭成本可控。',personality:'适合想要“高效、安全、国际化”又不愿离开华人生活圈的人。新加坡的好是“不用重新学一套生活逻辑”。',flaw:'常年湿热，住房和买车成本高；城市密度大，自然和“散漫感”稀缺。',tags:['双语','安全','高效','湿热']},
+  {name:'东京',sub:'日本 · 国外',profile:{dry:0.2,lively:0.9,slow:0.1,lowcost:-0.3,warm:0.1,food:0.9,tolerant:0.7,nature:0.3,metro:1,commuter:0.1,income:0.5,fourseason:0.7,quiet:-0.2,intl:0.7,stability:0.8},highlight:'城市秩序、公共交通和美食密度都是世界级，四季分明，华人生活配套成熟。适合喜欢“城市精密运转”的人。',personality:'适合享受便利、秩序和城市浓度、不介意高密度和社交距离感的人。东京的好是“什么都很到位”。',flaw:'住房和通勤拥挤，生活空间小；日语是长期融入的关键，社会氛围偏克制。',tags:['秩序','美食','便利','高密度']},
+  {name:'首尔',sub:'韩国 · 国外',profile:{dry:0.3,lively:0.9,slow:0.1,lowcost:-0.2,warm:0.2,food:0.8,tolerant:0.6,nature:0.4,metro:1,commuter:0.2,income:0.5,fourseason:0.7,quiet:-0.3,intl:0.7,stability:0.7},highlight:'城市活力、外卖便利和夜生活密度极高，华人适应门槛相对低。咖啡店、餐厅和公共交通把日常效率拉满。',personality:'适合喜欢热闹、快节奏和亚洲都市便利、对“慢”没有执念的人。首尔的好是“永远有事情发生”。',flaw:'节奏快、竞争压力大，住房成本不低；夏季湿热、冬季干冷。',tags:['活力','便利','夜生活','快节奏']},
+  {name:'釜山',sub:'韩国 · 国外',profile:{dry:0.4,lively:0.5,slow:0.5,lowcost:0.2,warm:0.4,food:0.7,tolerant:0.5,nature:0.8,metro:0.4,commuter:0.6,income:0.1,fourseason:0.6,quiet:0.4,intl:0.5,stability:0.7},highlight:'海港城市，节奏比首尔从容，物价更亲民。海鲜、温泉和海云台把日常幸福感拉得很具体，适合“想要城市感但不想太卷”的人。',personality:'适合喜欢海、喜欢韩餐、想要比首尔慢半拍的人。釜山的好是“热闹和海边可以兼得”。',flaw:'高薪机会不如首尔，国际化程度有限；夏季湿热，冬季风大。',tags:['海港','比首尔慢','海鲜','性价比']},
+  {name:'吉隆坡',sub:'马来西亚 · 国外',profile:{dry:-0.1,lively:0.6,slow:0.6,lowcost:0.8,warm:1,food:0.8,tolerant:0.7,nature:0.4,metro:0.4,commuter:0.5,income:-0.2,fourseason:-0.6,quiet:0.3,intl:0.7,stability:0.6},highlight:'生活成本比国内一线低一大截，中文/粤语/英语都能用，华人社区成熟。美食密度高，租房和日常开销对“低成本舒适生活”很友好。',personality:'适合想用低成本过上有品质生活、不介意常年夏天的人。吉隆坡的好是“熟悉又便宜”。',flaw:'全年湿热，公共交通和步行体验一般；收入水平有限，长期职业天花板不高。',tags:['低成本','华人便利','美食','常年夏']},
+  {name:'槟城',sub:'马来西亚 · 国外',profile:{dry:-0.1,lively:0.3,slow:0.8,lowcost:0.9,warm:1,food:0.9,tolerant:0.7,nature:0.6,metro:-0.5,commuter:0.8,income:-0.4,fourseason:-0.7,quiet:0.6,intl:0.6,stability:0.7},highlight:'华语环境极佳，街头美食密度可能是东南亚最高，生活成本低到让人放松。乔治市的骑楼和慢节奏把日子拉得很长。',personality:'适合追求低物欲、慢生活、华人文化熟悉感的人。槟城的好是“用很少的钱，吃很好的饭，过很慢的日子”。',flaw:'城市规模小，高薪工作机会少；常年湿热，公共交通有限。',tags:['华语','街头美食','低物欲','慢']},
+  {name:'曼谷',sub:'泰国 · 国外',profile:{dry:-0.3,lively:0.9,slow:0.4,lowcost:0.7,warm:1,food:1,tolerant:0.8,nature:0.2,metro:0.6,commuter:0.3,income:0,fourseason:-0.7,quiet:-0.3,intl:0.9,stability:0.5},highlight:'美食、按摩、夜市和国际化社区把“低成本享乐”拉得很高。外籍人士和数字游民生态成熟，租房和日常消费对预算友好。',personality:'适合喜欢热闹、美食、不介意湿热和一定混乱感的人。曼谷的好是“便宜又热闹”。',flaw:'全年湿热，交通拥堵，空气质量和城市规划有短板；长期居留政策需要研究。',tags:['美食','低成本','数字游民','热闹']},
+  {name:'清迈',sub:'泰国 · 国外',profile:{dry:0.1,lively:0.2,slow:1,lowcost:0.9,warm:0.9,food:0.7,tolerant:0.8,nature:0.8,metro:-1,commuter:0.9,income:-0.5,fourseason:-0.5,quiet:0.8,intl:0.8,stability:0.5},highlight:'数字游民和慢生活爱好者的聚集地，咖啡馆密度高、房租和日常开销极低。山、寺庙和夜市把日子调得很松。',personality:'适合远程工作、低物欲、喜欢自然和安静的人。清迈的好是“花很少的钱，过很慢的生活”。',flaw:'高薪本地就业机会几乎没有；烧山季空气质量差，夏季湿热。',tags:['数字游民','低物欲','慢生活','咖啡馆']},
+  {name:'巴厘岛',sub:'印度尼西亚 · 国外',profile:{dry:-0.2,lively:0.4,slow:0.8,lowcost:0.7,warm:1,food:0.5,tolerant:0.9,nature:1,metro:-0.8,commuter:0.9,income:-0.6,fourseason:-0.8,quiet:0.5,intl:0.9,stability:0.4},highlight:'自然密度极高，瑜伽、冲浪和慢生活社群成熟。生活成本对“简单生活”友好，适合把日常需求降到很低的人。',personality:'适合自由职业、自然爱好者和阶段性想“停下来”的人。巴厘岛的好是“身体和节奏一起松下来”。',flaw:'基础设施和医疗资源有限，交通拥堵；长期签证和居留政策需要持续关注。',tags:['自然','慢生活','社群','低成本']},
+  {name:'胡志明市',sub:'越南 · 国外',profile:{dry:-0.3,lively:0.9,slow:0.3,lowcost:0.8,warm:1,food:0.8,tolerant:0.6,nature:0.2,metro:0.4,commuter:0.2,income:-0.1,fourseason:-0.7,quiet:-0.4,intl:0.7,stability:0.4},highlight:'咖啡、河粉和摩托车流把城市活力拉得很高，生活成本低，外籍人士和创业社群在增长。适合“用低成本换高能量”的人。',personality:'适合喜欢热闹、街头美食和新兴市场活力、能接受一定混乱的人。胡志明市的好是“便宜、快、有生命力”。',flaw:'交通混乱、湿热、空气质量和基础设施有短板；长期居留政策需要规划。',tags:['低成本','活力','咖啡','街头美食']},
+  {name:'迪拜',sub:'阿联酋 · 国外',profile:{dry:1,lively:0.7,slow:0.2,lowcost:-0.3,warm:0.7,food:0.5,tolerant:0.8,nature:0.2,metro:0.7,commuter:0.5,income:0.8,fourseason:-0.5,quiet:0.1,intl:1,stability:0.8},highlight:'极度安全、国际化、免税收入，城市界面和基础设施新。干燥少雨，适合讨厌潮湿的人。',personality:'适合事业驱动、喜欢国际化环境、不介意炎热和“人造感”的人。迪拜的好是“效率和机会很直接”。',flaw:'夏季酷热，户外生活受限；生活成本不低，长期身份和归属感需要规划。',tags:['免税','干燥','安全','国际化']},
+  {name:'特拉维夫',sub:'以色列 · 国外',profile:{dry:0.8,lively:0.8,slow:0.3,lowcost:-0.5,warm:0.7,food:0.6,tolerant:0.7,nature:0.6,metro:0.4,commuter:0.4,income:0.6,fourseason:0.2,quiet:-0.2,intl:0.9,stability:0.4},highlight:'地中海阳光、海滩和创业文化把城市能量拉得很高。干燥少雨，适合喜欢“海边+城市活力”的人。',personality:'适合喜欢阳光、海、创业氛围和直接沟通文化的人。特拉维夫的好是“不绕弯子的活力”。',flaw:'生活成本高，安全局势存在不确定性；夏季炎热。',tags:['地中海','创业','阳光','高成本']},
+  {name:'布拉格',sub:'捷克 · 国外',profile:{dry:0.3,lively:0.5,slow:0.6,lowcost:0.4,warm:-0.1,food:0.5,tolerant:0.7,nature:0.5,metro:0.4,commuter:0.6,income:0.1,fourseason:0.7,quiet:0.5,intl:0.7,stability:0.7},highlight:'欧洲老城的审美密度极高，生活成本在中东欧算友好。城市不大，步行和电车就能覆盖日常，适合“低成本欧洲生活”的想象。',personality:'适合喜欢历史感、步行、安静和低成本欧洲生活的人。布拉格的好是“美得很日常”。',flaw:'收入水平在西欧偏低，冬季阴冷；旅游过热推高部分区域房租。',tags:['老城','低成本欧洲','步行','审美']}
+];
+
+let answers = new Array(QUESTIONS.length).fill(null);
+let currentQ = 0;
+
+function buildUserVector(){
+  const v = {};
+  DIMS.forEach(d => v[d] = 0);
+  answers.forEach((optIdx, qi) => {
+    const opt = QUESTIONS[qi].options[optIdx];
+    DIMS.forEach(d => {
+      if(opt.v[d] !== undefined) v[d] += opt.v[d];
+    });
+  });
+  DIMS.forEach(d => {
+    v[d] = v[d] / Math.sqrt(QUESTIONS.length);
+    v[d] = Math.max(-1.5, Math.min(1.5, v[d]));
+  });
+  return v;
+}
+
+function matchScore(city, uv){
+  let dot = 0, cityNorm = 0, userNorm = 0;
+  DIMS.forEach(d => {
+    const c = city.profile[d] !== undefined ? city.profile[d] : 0;
+    const u = uv[d] !== undefined ? uv[d] : 0;
+    dot += c * u;
+    cityNorm += c * c;
+    userNorm += u * u;
+  });
+  const cos = (cityNorm === 0 || userNorm === 0) ? 0 : dot / (Math.sqrt(cityNorm) * Math.sqrt(userNorm));
+  const keyBoost =
+    0.08 * (1 - Math.abs((city.profile.dry||0) - (uv.dry||0)) / 2) +
+    0.08 * (1 - Math.abs((city.profile.lowcost||0) - (uv.lowcost||0)) / 2) +
+    0.06 * (1 - Math.abs((city.profile.slow||0) - (uv.slow||0)) / 2);
+  return cos + keyBoost;
+}
+
+function pickCity(){
+  const uv = buildUserVector();
+  let best = null, bestScore = -Infinity;
+  CITIES.forEach(c => {
+    const s = matchScore(c, uv);
+    if(s > bestScore){ bestScore = s; best = c; }
+  });
+  return best;
+}
+
+const cover = document.getElementById('cover');
+const quiz = document.getElementById('quiz');
+const result = document.getElementById('result');
+const questionContainer = document.getElementById('questionContainer');
+const progressText = document.getElementById('progressText');
+const progressPct = document.getElementById('progressPct');
+const progressFill = document.getElementById('progressFill');
+
+function renderQuestion(index){
+  const q = QUESTIONS[index];
+  const card = document.createElement('div');
+  card.className = 'question-card active';
+  card.id = 'q' + index;
+  card.innerHTML = `
+    <div class="q-num">QUESTION ${String(index+1).padStart(2,'0')}</div>
+    <div class="q-title">${q.q}</div>
+    <div class="options">
+      ${q.options.map((o,oi)=>`
+        <button class="option ${answers[index]===oi?'selected':''}" onclick="selectOption(${index},${oi},this)">
+          <span class="opt-index">${String.fromCharCode(65+oi)}</span>${o.t}
+        </button>
+      `).join('')}
+    </div>
+    <button class="next-btn ${answers[index]!==null?'show':''}" id="nextBtn${index}" onclick="goNext(${index})">
+      ${index === QUESTIONS.length-1 ? '查看结果' : '下一题'}
+    </button>
+  `;
+  questionContainer.innerHTML = '';
+  questionContainer.appendChild(card);
+  updateProgress(index);
+}
+
+function updateProgress(index){
+  progressText.textContent = `${index+1} / ${QUESTIONS.length}`;
+  const pct = Math.round(((index+1)/QUESTIONS.length)*100);
+  progressPct.textContent = pct + '%';
+  progressFill.style.width = pct + '%';
+}
+
+function selectOption(qi, oi, el){
+  answers[qi] = oi;
+  const parent = el.parentElement;
+  parent.querySelectorAll('.option').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  const nextBtn = document.getElementById('nextBtn'+qi);
+  if(nextBtn) nextBtn.classList.add('show');
+}
+
+function goNext(qi){
+  if(answers[qi] === null) return;
+  if(qi === QUESTIONS.length - 1){
+    showResult();
+    return;
+  }
+  currentQ = qi + 1;
+  renderQuestion(currentQ);
+}
+
+function startQuiz(){
+  cover.style.display = 'none';
+  quiz.style.display = 'block';
+  result.style.display = 'none';
+  answers = new Array(QUESTIONS.length).fill(null);
+  currentQ = 0;
+  renderQuestion(0);
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function showResult(){
+  const city = pickCity();
+  quiz.style.display = 'none';
+  result.style.display = 'block';
+
+  document.getElementById('cityName').innerHTML = `${city.name}<small>${city.sub.split(' · ')[1] || ''}</small>`;
+  document.getElementById('citySub').textContent = city.sub;
+  document.getElementById('cityHighlight').textContent = city.highlight;
+  document.getElementById('cityPersonality').textContent = city.personality;
+  document.getElementById('cityFlaw').textContent = city.flaw;
+  document.getElementById('cityTags').innerHTML = city.tags.map(t=>`<span class="tag">${t}</span>`).join('');
+
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function resetQuiz(){
+  cover.style.display = 'block';
+  quiz.style.display = 'none';
+  result.style.display = 'none';
+  answers = new Array(QUESTIONS.length).fill(null);
+  currentQ = 0;
+  progressFill.style.width = '0%';
+  progressText.textContent = '1 / 15';
+  progressPct.textContent = '7%';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+renderQuestion(0);
+</script>
+</body>
+</html>
